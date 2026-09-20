@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap");
+
+:root {
+    background: #18334a;
+    color: #fffdf4;
+    font-family: "Pixelify Sans", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body,
+#root,
+main,
+.experience,
+#experience-canvas {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.experience {
+    inset: 0;
+    position: fixed;
+}
+
+#experience-canvas {
+    display: block;
+}
+
+.modal {
+    background: #589db0;
+    border: 3px solid #fffdf4;
+    box-shadow: 10px 10px 0 #18334a;
+    left: 50%;
+    max-height: min(80vh, 700px);
+    max-width: 700px;
+    overflow-y: auto;
+    padding: 20px;
+    position: fixed;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 32px);
+    z-index: 10;
+}
+
+.modal-header {
+    align-items: center;
+    border-bottom: 2px solid #fffdf4;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+}
+
+.modal h1,
+.content-card h2 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.modal-blurb,
+.content-card p {
+    font-size: 1.1rem;
+    line-height: 1.45;
+}
+
+.card-list {
+    display: grid;
+    gap: 14px;
+}
+
+.content-card {
+    background: #24546b;
+    border: 2px solid #fffdf4;
+    padding: 16px;
+}
+
+.card-meta {
+    color: #f8d766;
+    margin: 5px 0 12px;
+}
+
+button,
+.content-card a {
+    background: #f8d766;
+    border: 2px solid #18334a;
+    color: #18334a;
+    cursor: pointer;
+    display: inline-block;
+    font: inherit;
+    margin-top: 14px;
+    padding: 8px 12px;
+    text-decoration: none;
+}
+
+.modal-exit-button {
+    margin: 0;
+}
+
+button:hover,
+.content-card a:hover {
+    background: #fffdf4;
+}
