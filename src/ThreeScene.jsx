@@ -20,6 +20,7 @@ const catSoundFiles = {
     Cat_Black: "sounds/cat_meow.mp3",
     Cat_Orange: "sounds/cat_meow.mp3"
 };
+const signSoundFile = "sounds/open_sign.mp3";
 
 export default function ThreeScene({ onObjectClick }) {
     const canvasRef = useRef(null);
@@ -31,7 +32,7 @@ export default function ThreeScene({ onObjectClick }) {
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
         const clickableObjects = [];
-        const catSounds = new Map();
+        const clickSounds = new Map();
         let portfolioModel;
         const character = {
             instance: null,
@@ -49,8 +50,11 @@ export default function ThreeScene({ onObjectClick }) {
 
         const frustumHeight = 100;
         const camera = new THREE.OrthographicCamera(-50, 50, 50, -50, 1, 1000);
-        camera.position.set(-20, 22, 61);
+        // Keep foreground trees in front of the near clipping plane while orbiting.
+        camera.position.set(-20, 22, 61).multiplyScalar(5);
         scene.add(camera);
+        camera.zoom = 1.5;
+        camera.updateProjectionMatrix();
 
         const sun = new THREE.DirectionalLight(0xffffff, 1);
         sun.castShadow = true;
@@ -65,7 +69,12 @@ export default function ThreeScene({ onObjectClick }) {
         scene.add(new THREE.AmbientLight(0x404040, 20));
 
         const controls = new OrbitControls(camera, canvas);
+        controls.enablePan = false;
+        controls.minZoom = camera.zoom;
         controls.update();
+        const cameraFollowTarget = new THREE.Vector3();
+        const cameraFollowDelta = new THREE.Vector3();
+        let characterGroundHeight = 0;
 
         function resize() {
             const width = window.innerWidth;
@@ -109,18 +118,20 @@ export default function ThreeScene({ onObjectClick }) {
             const clickedObject = getObjectUnderPointer(event);
             if (!clickedObject) return;
 
-            const soundFile = catSoundFiles[clickedObject.name];
+            const isSign = clickedObject.name.endsWith("_Sign");
+            const soundFile = isSign ? signSoundFile : catSoundFiles[clickedObject.name];
+            const soundKey = isSign ? "sign" : clickedObject.name;
             if (soundFile) {
-                let sound = catSounds.get(clickedObject.name);
+                let sound = clickSounds.get(soundKey);
                 if (!sound) {
                     sound = new Audio(`${import.meta.env.BASE_URL}${soundFile}`);
-                    catSounds.set(clickedObject.name, sound);
+                    clickSounds.set(soundKey, sound);
                 }
                 sound.currentTime = 0;
                 sound.play().catch((error) => {
                     console.warn(`Could not play ${soundFile}. Check public/sounds/.`, error);
                 });
-                return;
+                if (!isSign) return;
             }
 
             handleObjectClick(clickedObject.name);
@@ -211,6 +222,10 @@ export default function ThreeScene({ onObjectClick }) {
             });
 
             scene.add(portfolioModel);
+            if (character.instance) {
+                character.instance.getWorldPosition(cameraFollowTarget);
+                characterGroundHeight = cameraFollowTarget.y;
+            }
         });
 
         window.addEventListener("resize", resize);
@@ -220,7 +235,18 @@ export default function ThreeScene({ onObjectClick }) {
         canvas.addEventListener("click", handleClick);
         resize();
 
-        renderer.setAnimationLoop(() => renderer.render(scene, camera));
+        renderer.setAnimationLoop(() => {
+            if (character.instance) {
+                character.instance.getWorldPosition(cameraFollowTarget);
+                // Follow horizontal movement without bouncing during jumps.
+                cameraFollowTarget.y = characterGroundHeight;
+                cameraFollowDelta.subVectors(cameraFollowTarget, controls.target);
+                camera.position.add(cameraFollowDelta);
+                controls.target.copy(cameraFollowTarget);
+                controls.update();
+            }
+            renderer.render(scene, camera);
+        });
 
         return () => {
             window.removeEventListener("resize", resize);
@@ -228,12 +254,12 @@ export default function ThreeScene({ onObjectClick }) {
             canvas.removeEventListener("pointermove", handlePointerMove);
             canvas.removeEventListener("pointerleave", handlePointerLeave);
             canvas.removeEventListener("click", handleClick);
-            catSounds.forEach((sound) => {
+            clickSounds.forEach((sound) => {
                 sound.pause();
                 sound.removeAttribute("src");
                 sound.load();
             });
-            catSounds.clear();
+            clickSounds.clear();
             controls.dispose();
             renderer.setAnimationLoop(null);
             renderer.dispose();

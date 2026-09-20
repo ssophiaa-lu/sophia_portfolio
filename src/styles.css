@@ -70,6 +70,10 @@ body {
     line-height: 1.45;
 }
 
+.modal-blurb {
+    white-space: pre-line;
+}
+
 .card-list {
     display: grid;
     gap: 14px;

@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ContentPanel from "./ContentPanel.jsx";
 import ThreeScene from "./ThreeScene.jsx";
+
+// Path relative to public/. Change this to use a different MP3.
+const backgroundMusicFile = "sounds/music_zapsplat_banana_tree.mp3";
 
 const panelContent = {
     About_Sign: {
@@ -12,12 +15,12 @@ const panelContent = {
     Start_Sign: {
         type: "blurb",
         title: "Start",
-        body: "welcome to my site! you can move around using W, A, S, D on your keyboard :) "
+        body: "welcome to my site! you can move around using the arrow keys or W, A, S, D on your keyboard :) "
     },
     End_Sign: {
         type: "blurb",
         title: "End",
-        body: "curious how i made this portfolio? i used the Blender software to create all assets by hand! from there, i used React and Three.js to wire everything together. if you're interested in learning 3D modeling, this is the tutorial i used: . i hope you have a great day and thanks for visiting :) "
+        body: "curious how i made this portfolio? i used the Blender software to create all assets by hand! from there, i used React and Three.js to wire everything together. if you're interested in learning 3D modeling, check out Andrew Woan on YouTube! \n\ni hope you have a great day and thanks for visiting :) \n\n credits: music and sound effects are from zapslat.com"
     },
     Experience_Sign: {
         type: "cards",
@@ -52,6 +55,41 @@ const panelContent = {
 
 export default function App() {
     const [activePanel, setActivePanel] = useState(null);
+
+    useEffect(() => {
+        const music = new Audio(`${import.meta.env.BASE_URL}${backgroundMusicFile}`);
+        music.loop = true;
+        music.volume = 0.8;
+        let disposed = false;
+
+        function removeStartListeners() {
+            window.removeEventListener("click", startMusic);
+            window.removeEventListener("keydown", startMusic);
+        }
+
+        function startMusic() {
+            music.play().then(removeStartListeners).catch((error) => {
+                if (disposed || error.name === "AbortError") return;
+                if (error.name !== "NotAllowedError") {
+                    removeStartListeners();
+                    console.warn(`Could not play ${backgroundMusicFile}.`, error);
+                }
+            });
+        }
+
+        // Retry on interaction if the browser blocks audible autoplay.
+        window.addEventListener("click", startMusic);
+        window.addEventListener("keydown", startMusic);
+        startMusic();
+
+        return () => {
+            disposed = true;
+            removeStartListeners();
+            music.pause();
+            music.removeAttribute("src");
+            music.load();
+        };
+    }, []);
 
     function handleObjectClick(objectName) {
         if (panelContent[objectName]) {
