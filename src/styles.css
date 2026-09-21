@@ -74,6 +74,10 @@ body {
     white-space: pre-line;
 }
 
+.experience-description {
+    font-family: Arial, sans-serif;
+}
+
 .card-list {
     display: grid;
     gap: 14px;

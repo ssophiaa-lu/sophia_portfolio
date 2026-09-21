@@ -9,7 +9,7 @@ const panelContent = {
     About_Sign: {
         type: "blurb",
         title: "About",
-        body: "hi, i'm sophia. i go to Rutgers, New Brunswick and i'm studying computer science and data science!"
+        body: "hi, i'm sophia. i go to Rutgers, New Brunswick and i'm studying computer science and data science. in my free time, i like to 3D model and try new cafe spots!"
 
     },
     Start_Sign: {
@@ -24,12 +24,18 @@ const panelContent = {
     },
     Experience_Sign: {
         type: "cards",
+        descriptionClassName: "experience-description",
         title: "Experience",
         items: [
             {
                 title: "Software Engineering Intern",
                 meta: "Fiserv | June 2026 - August 2026",
-                description: "desc"
+                description: "refactored a shared Spring Boot library used across 17 microservices in Docker and Azure environments, leveraging Codex to identify edge cases and accelerate JUnit test development, increasing coverage by 26%. enabled direct service-to-service communication in Azure Kubernetes Service, removing ingress routing and credential dependencies. integrated grafana k6 load tests into Harness CI/CD, giving engineers a reliable way to evaluate microservice health."
+            },
+            {
+                title: "Break Through Tech AI Fellow",
+                meta: "Cornell Tech, Microsoft | May 2025 - Present",
+                description: "selected from 4,000+ applicants to complete a year-long program focused on agentic ai and machine learning. as part of the program, developing an end-to-end python ML pipeline with Microsoft to estimate systolic and diastolic blood pressure from PPG signals, including preprocessing physiological datasets with Python, Numpy, and Pandas, and evaluating regression models using MAE, RMSE, R², and feature-importance analysis."
             }
         ]
     },

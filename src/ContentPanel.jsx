@@ -45,7 +45,7 @@ export default function ContentPanel({ content, onClose }) {
                         <article className="content-card" key={item.title}>
                             <h2>{item.title}</h2>
                             <p className="card-meta">{item.meta}</p>
-                            <p>{item.description}</p>
+                            <p className={content.descriptionClassName}>{item.description}</p>
                             {item.link && (
                                 <a href={item.link} rel="noreferrer" target="_blank">
                                     View Project
